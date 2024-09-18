@@ -121,10 +121,20 @@ impl Writer {
         self.column_position = 0;
         if self.row_position > SCREEN_HEIGHT - 1 {
             self.buffer.copy_within(1.., 0);
-            self.buffer[SCREEN_HEIGHT - 1] = [BLANK_CHAR; SCREEN_WIDTH];
+            self.buffer[SCREEN_HEIGHT - 1].fill(BLANK_CHAR);
             self.row_position = SCREEN_HEIGHT - 1;
         }
     }
+
+    fn clear(&mut self) {
+        self.buffer.fill([BLANK_CHAR; SCREEN_WIDTH]);
+        self.row_position = 0;
+        self.column_position = 0;
+    }
+}
+
+pub fn clear_screen() {
+    WRITER.lock().clear();
 }
 
 pub fn set_colour(bg: Colour, fg: Colour) {
@@ -179,4 +189,58 @@ macro_rules! println {
     ($lit: literal $($args: tt)*) => {
         print!("{}\n", format_args!($lit $($args)*));
     };
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    macro_rules! print_one_line {
+        ($line: literal) => {{
+            assert!($line.len() < SCREEN_WIDTH); // Just ensure that it fits on one line
+            println!("{}", $line);
+            $line
+        }};
+    }
+
+    macro_rules! assert_line_is {
+        ($number: expr, $line: expr) => {
+            let mut chars = $line.chars();
+            for i in 0..SCREEN_WIDTH {
+                let screen_char = WRITER.lock().buffer[$number][i];
+                if let Some(c) = chars.next() {
+                    assert_eq!(screen_char.char_code as char, c);
+                } else {
+                    assert_eq!(screen_char.char_code, 0);
+                }
+            }
+        };
+    }
+
+    #[test_case]
+    fn test_write() {
+        clear_screen();
+        let s = print_one_line!("Lorem ipsum dolor sit amet");
+        assert_line_is!(0, s);
+    }
+
+    #[test_case]
+    fn test_lines() {
+        clear_screen();
+        let s1 = print_one_line!("Lorem ipsum dolor sit amet");
+        let s2 = print_one_line!("consectetur adipiscing elit");
+        assert_line_is!(0, s1);
+        assert_line_is!(1, s2);
+    }
+
+    #[test_case]
+    fn test_many_lines() {
+        clear_screen();
+        print_one_line!("Lorem ipsum dolor sit amet");
+        let s2 = print_one_line!("consectetur adipiscing elit");
+        for n in 2..SCREEN_HEIGHT {
+            println!("line {}", n);
+        }
+        assert_line_is!(0, s2);
+    }
 }

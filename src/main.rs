@@ -20,4 +20,6 @@ pub extern "C" fn _start() -> ! {
 
 fn main() {
     println!("hello world");
+    println!(Red, "hello world");
+    println!(Blue, "hello world");
 }

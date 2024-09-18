@@ -1,5 +1,15 @@
 # Encrypted Operating System
 
+#Install
+
+```sh
+rustup component add rust-src
+rustup component add llvm-tools-preview
+cargo install bootimage
+# (install qemu)
+cargo r
+```
+
 # TODO
 -   Everything else (will break up tasks later)
 

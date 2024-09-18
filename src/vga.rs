@@ -73,6 +73,9 @@ lazy_static! {
         column_position: 0,
         row_position: 0,
         colour: VgaColour::new(Colour::Black, Colour::White),
+        // SAFETY: VGA memory buffer starts at address 0xb8000 and is exactly
+        // `SCREEN_WIDTH * SCREEN_HIGHT * 2` bytes long.  Since VgaChar is 2 bytes, we are
+        // referencing the exact buffer and not a byte more.
         buffer: unsafe { &mut *(0xb8000 as *mut TextBuffer) },
     });
 }

@@ -32,12 +32,12 @@
     - This should cause high accountability
 
 # There should be some way to encrypt the memory so that even buffer overflows are ineffective
-    - Not only that, but memory forensics should be impossible without the key.
+- Not only that, but memory forensics should be impossible without the key.
 
 # The os should also focus on privacy.
-    - Anything done over the network should be heavily protected.
-    - If the user destroys all copies of the root private key, the entire disk is destroyed (since it is encrypted)
-    - use spoofed mac addr
+- Anything done over the network should be heavily protected.
+- If the user destroys all copies of the root private key, the entire disk is destroyed (since it is encrypted)
+- use spoofed mac addr
 
 
 

@@ -7,7 +7,7 @@ edition = "2018"
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", # Add the device used to tell QEMU to exit
     "-serial", "stdio", # Allow serial for pritning to host console
-    #"-display", "none", # Don't show QEMU
+    "-display", "none", # Don't show QEMU
 ]
 test-success-exit-code = 33
 test-timeout = 300

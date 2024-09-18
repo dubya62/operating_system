@@ -11,16 +11,31 @@ cargo r
 ```
 
 # TODO
--   Everything else (will break up tasks later)
+-   Disk management
+-   Memory management
+-   System call interface
+-   Process management
+-   Device drivers
+-   Implement standard library
+-   Init shell process
 
 # DOING
--   Write the bootloader (W)
--   Write "hello world" program (Hayden)
 
 # DONE
+-   Write the bootloader (temporary solution)
+-   Write "hello world" program (Hayden)
 
 # VERIFIED
 
+
+# BACKLOG
+-   Disk management
+-   Memory management
+-   System call interface
+-   Process management
+-   Device drivers
+-   Implement standard library
+-   Init shell process
 
 
 

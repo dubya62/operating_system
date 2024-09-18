@@ -170,7 +170,7 @@ macro_rules! println {
     ($fg: ident, $lit: literal $($args: tt)*) => {{
         let col = $crate::vga::get_colour();
         $crate::vga::set_colour(col.bg(), $crate::vga::Colour::$fg);
-        print!("{}\n", format_args!($lit $($args)*));
+        println!($lit $($args)*);
         $crate::vga::set_colour(col.bg(), col.fg());
     }};
     ($lit: literal $($args: tt)*) => {

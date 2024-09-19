@@ -56,5 +56,34 @@ int sys_stat(const char* pathname, struct stat* statbuf);
 //==============================================
 int sys_fstat(int fd, struct stat* statbuf);
 
+//==============================================
+// SYSCALL 0x006 (006)
+// int sys_lstat(const char* pathname, struct stat* statbuf);
+// TODO
+//==============================================
+int sys_lstat(const char* pathname, struct stat* statbuf);
+
+//==============================================
+// SYSCALL 0x007 (007)
+// int sys_poll(struct poll_fd *ufds, unsigned int nfds, long timeout_msecs);
+// TODO
+//==============================================
+int sys_poll(struct poll_fd *ufds, unsigned int nfds, long timeout_msecs);
+
+//==============================================
+// SYSCALL 0x008 (008)
+// int sys_lseek(unsigned int fd, off_t offset, unsigned int origin);
+// TODO
+//==============================================
+int sys_lseek(unsigned int fd, int offset, unsigned int origin);
+
+//==============================================
+// SYSCALL 0x009 (009)
+// int sys_mmap(unsigned long addr, unsigned long len);
+// TODO
+//==============================================
+int sys_lseek(unsigned int fd, int offset, unsigned int origin);
+
+
 
 

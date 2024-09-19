@@ -1,6 +1,6 @@
 # Encrypted Operating System
 
-#Install
+# Install
 
 ```sh
 rustup component add rust-src
@@ -9,6 +9,42 @@ cargo install bootimage
 # (install qemu)
 cargo r
 ```
+
+# Groups
+-   Each user has their own group with only them and root in it by default
+-   Each group has a key
+
+# File Management
+-   Use Linux-like file permissions (user,group,other and read,write,execute)
+-   The file is encrypted with the group key.
+-   If the owner or a member of the group wishes to read/write/execute the file, simply use the group key
+-   If any other person wishes to read/execute the file, call the kernel to decrypt with the group key
+-   If any other person wishes to write to the file, call the kernel to encrypt with the group key
+-   It would be possible to use the kernel to enforce file permissions, but this setup should make it impossible to boot from another device and read what they should not be able to read (even if they have their own keys)
+
+# Key Management
+-   There are three main sections of the disk: (though not necessarily partitions)
+    - Bootloader
+    - Kernel
+    - Rest of Disk (user area)
+-   Any user should be able to start the computer up.
+    - Users will plug in their thumb drive.
+    - Bootloader uses information from the thumb drive (including their key) to decrypt the kernel.
+    - The kernel gets decrypted and ran.
+    - The kernel jumps to user space as the owner of the key.
+-   What keys should exist?
+    - login keys (asymmetric key to login with)
+    - user keys (symmetric key for each user in /etc/passwd)
+    - group keys (symmetric key for each group in /etc/group)
+-   How is the kernel protected?
+    - Make the kernel read only by encrypting it with an asymmetric key and then throwing the key away.
+    - For each login key, make a copy of the kernel decryption key encrypted with the login key (this way any user can decrypt the kernel without having multiple copies of the kernel or sharing login keys)
+    - The other key can only decrypt the kernel, but cannot encrypt it back
+    - To verify the integrity of the kernel, use a hash along with a predetermined value somewhere in the encrypted block.
+    - In this way, it is impossible to modify the kernel.
+    - To perform a kernel update, we may have to go through this process again and reencrypt the entire kernel since the key will be thrown away.
+
+
 
 # TODO
 -   Disk management

@@ -2,7 +2,7 @@ use core::fmt;
 
 use lazy_static::lazy_static;
 use spin::Mutex;
-use x86_64::instructions::port::Port;
+use x86_64::instructions::{interrupts, port::Port};
 
 const SCREEN_HEIGHT: usize = 25;
 const SCREEN_WIDTH: usize = 80;
@@ -168,13 +168,21 @@ impl fmt::Write for Writer {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    WRITER.lock().write_fmt(args).unwrap();
+    interrupts::without_interrupts(|| {
+        WRITER.lock().write_fmt(args).unwrap();
+    });
 }
 
 #[macro_export]
 macro_rules! print {
-    ($($args: tt)*) => {
-        ($crate::vga::_print(format_args!($($args)*)))
+    ($fg: ident, $lit: literal $($args: tt)*) => {{
+        let col = $crate::vga::get_colour();
+        $crate::vga::set_colour(col.bg(), $crate::vga::Colour::$fg);
+        print!($lit $($args)*);
+        $crate::vga::set_colour(col.bg(), col.fg());
+    }};
+    ($lit: literal $($args: tt)*) => {
+        ($crate::vga::_print(format_args!($lit $($args)*)))
     };
 }
 

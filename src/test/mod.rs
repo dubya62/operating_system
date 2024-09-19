@@ -1,5 +1,9 @@
 use core::panic::PanicInfo;
 
+use x86_64::instructions::port::Port;
+
+use crate::hlt_loop;
+
 #[macro_use]
 mod serial;
 
@@ -12,8 +16,9 @@ pub enum QemuExitCode {
 
 pub fn exit_qemu(exit_code: QemuExitCode) {
     // SAFETY: This is the correct port and the correct code
+    let mut port = Port::new(0xf4);
     unsafe {
-        x86::io::outl(0xf4, exit_code as u32);
+        port.write(exit_code as u32);
     }
 }
 
@@ -45,7 +50,7 @@ fn panic(info: &PanicInfo) -> ! {
     serial_println!("FAILED\n");
     serial_println!("Error: {}", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    hlt_loop();
 }
 
 #[test_case]

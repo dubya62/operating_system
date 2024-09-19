@@ -24,6 +24,8 @@ bootloader = "0.9"
 spin = "0.9.8"
 x86_64 = "0.15.1"
 lazy_static = { version = "1.0", features = ["spin_no_std"] }
+pic8259 = "0.11.0"
+pc-keyboard = "0.8.0"
 
 [dev-dependencies]
 uart_16550 = "0.2.0"

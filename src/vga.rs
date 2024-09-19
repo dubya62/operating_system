@@ -2,6 +2,7 @@ use core::fmt;
 
 use lazy_static::lazy_static;
 use spin::Mutex;
+use x86_64::instructions::port::Port;
 
 const SCREEN_HEIGHT: usize = 25;
 const SCREEN_WIDTH: usize = 80;
@@ -147,11 +148,13 @@ pub fn get_colour() -> VgaColour {
 
 pub fn move_cursor(x: u8, y: u8) {
     let pos = y as u16 * SCREEN_WIDTH as u16 + x as u16;
+    let mut porta = Port::new(0x3d4);
+    let mut portb = Port::new(0x3d5);
     unsafe {
-        x86::io::outb(0x3D4, 0x0F);
-        x86::io::outb(0x3D5, (pos & 0xFF) as u8);
-        x86::io::outb(0x3D4, 0x0E);
-        x86::io::outb(0x3D5, ((pos >> 8) & 0xFF) as u8);
+        porta.write(0x0F_u8);
+        portb.write((pos & 0xFF) as u8);
+        porta.write(0x0E_u8);
+        portb.write(((pos >> 8) & 0xFF) as u8);
     }
 }
 

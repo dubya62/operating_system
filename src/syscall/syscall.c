@@ -79,10 +79,17 @@ int sys_lseek(unsigned int fd, int offset, unsigned int origin);
 
 //==============================================
 // SYSCALL 0x009 (009)
-// int sys_mmap(unsigned long addr, unsigned long len);
+// void* mmap(void addr[.length], size_t length, int prot, int flags, int fd, off_t offset);
+//
 // TODO
 //==============================================
-int sys_lseek(unsigned int fd, int offset, unsigned int origin);
+void* mmap(void addr, unsigned int length, int prot, int flags, int fd, int offset);
+
+
+
+
+
+
 
 
 

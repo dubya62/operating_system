@@ -45,6 +45,11 @@ cargo r
     - To perform a kernel update, we may have to go through this process again and reencrypt the entire kernel since the key will be thrown away.
 
 
+# Some more ideas (once kernel is done)
+-   Add Ransomware protection (detect when file extensions and headers are changing rapidly)
+-   Add email/browser sandboxing
+-   Add automatic snapshots that allow recovery in case of malware
+
 
 # TODO
 -   Disk management

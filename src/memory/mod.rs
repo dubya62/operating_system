@@ -1,4 +1,7 @@
-use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
+use bootloader::{
+    bootinfo::{MemoryMap, MemoryRegionType},
+    BootInfo,
+};
 use x86_64::{
     registers::control::Cr3,
     structures::paging::{FrameAllocator, Mapper, OffsetPageTable, Page, PhysFrame, Size4KiB},
@@ -12,13 +15,17 @@ pub mod allocator;
 /// - The complete physical memory must be mapped to virtual memory at the passed
 /// `physical_memory_offset`.
 /// - This function must be only called once to avoid aliasing `&mut` references.
-pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
+pub fn init(boot_info: &'static BootInfo) {
+    let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let (level_4_table_frame, _) = Cr3::read();
 
     let phys = level_4_table_frame.start_address();
-    let virt = physical_memory_offset + phys.as_u64();
+    let virt = phys_mem_offset + phys.as_u64();
 
-    OffsetPageTable::new(&mut *virt.as_mut_ptr(), physical_memory_offset)
+    let mut mapper = unsafe { OffsetPageTable::new(&mut *virt.as_mut_ptr(), phys_mem_offset) };
+    let mut frame_allocator = BootInfoFrameAllocator::new(&boot_info.memory_map);
+
+    allocator::init_heap(&mut mapper, &mut frame_allocator).expect("heap initialization failed");
 }
 
 /// Creates an example mapping for the given page to frame `0xb8000`.

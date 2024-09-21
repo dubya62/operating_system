@@ -7,6 +7,7 @@
 
 #[macro_use]
 pub mod vga;
+pub mod crypt;
 
 #[cfg(test)]
 pub mod test;

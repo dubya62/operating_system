@@ -32,7 +32,6 @@
 //!     
 ////////////////////////////////////////////////////
 
-
 pub mod AES {
     ////////////////////////////////////////////////////
     // AES-256 FUNCTIONS
@@ -107,7 +106,7 @@ pub mod AES {
     // applies the S-box to each of the four bytes to produce an output word.
     // FIXME: when SBOX is turned into a function, simply pass u8 as the argument instead of having
     // to typecast every time
-    fn sub_word(tempa: &mut [u8; 4]){
+    fn sub_word(tempa: &mut [u8; 4]) {
         tempa[0] = SBOX[tempa[0] as usize];
         tempa[1] = SBOX[tempa[1] as usize];
         tempa[2] = SBOX[tempa[2] as usize];
@@ -254,20 +253,18 @@ pub mod AES {
     // Note: The last call to xtime() is unneeded, but often ends up generating a smaller binary
     //       The compiler seems to be able to vectorize the operation better this way.
     //       See https://github.com/kokke/tiny-AES-c/pull/34
-    fn multiply(x: u8, y: u8) -> u8{
+    fn multiply(x: u8, y: u8) -> u8 {
         return ((y & 1) * x)
             ^ ((y >> 1 & 1) * xtime(x))
             ^ ((y >> 2 & 1) * xtime(xtime(x)))
             ^ ((y >> 3 & 1) * xtime(xtime(xtime(x))))
-            ^ ((y >> 4 & 1) * xtime(xtime(xtime(xtime(x)))))
-            ; /* this last call to xtime() can be omitted */
+            ^ ((y >> 4 & 1) * xtime(xtime(xtime(xtime(x))))); /* this last call to xtime() can be omitted */
     }
 
     // MixColumns function mixes the columns of the state matrix.
     // The method used to multiply may be difficult to understand for the inexperienced.
     // Please use the references to gain more information.
     fn inv_mix_columns(state: &mut StateT) {
-
         for i in 0..4 {
             let a = state[i][0];
             let b = state[i][1];
@@ -390,9 +387,9 @@ pub mod AES {
         iv: [u8; AES_BLOCKLEN],
     }
 
-    impl AesCtx{
-        pub fn new(round_key: [u8; AES_KEYEXPSIZE], iv: [u8; AES_BLOCKLEN]) -> Self{
-            return AesCtx{
+    impl AesCtx {
+        pub fn new(round_key: [u8; AES_KEYEXPSIZE], iv: [u8; AES_BLOCKLEN]) -> Self {
+            return AesCtx {
                 round_key: round_key,
                 iv: iv,
             };

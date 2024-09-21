@@ -17,6 +17,8 @@ pub mod vga;
 pub mod gdt;
 pub mod interrupts;
 pub mod memory;
+pub mod crypt;
+
 
 #[cfg(test)]
 pub mod test;

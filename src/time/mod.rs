@@ -1,2 +1,2 @@
-pub mod timestruct;
 pub mod clock;
+pub mod timestruct;

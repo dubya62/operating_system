@@ -54,12 +54,20 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     hlt_loop();
 }
 
+pub mod error;
 pub mod file;
+pub mod time;
 use crate::file::fs;
+use crate::file::pipe;
+use error::error::Error;
 
 fn main() {
     println!("hello world");
     println!(Red, "hello world");
     println!(Blue, "hello world");
-    
+
+    fs::Stat::empty();
+
+    let err: Error = Error::new(10);
+    err.perror();
 }

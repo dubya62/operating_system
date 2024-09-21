@@ -1,5 +1,5 @@
 /////////////////////////////////////////////
-//! The purpose of this file is to provide basic 
+//! The purpose of this file is to provide basic
 //! time structures
 //!
 //! It provides the following public functionality:
@@ -10,7 +10,7 @@
 //! }
 //!     new(tv_sec: i32, tv_nsec: i32) -> Self - constructor
 //!     empty() -> Self - constructor with empty vals
-//! 
+//!
 /////////////////////////////////////////////
 
 // timespec structure
@@ -30,14 +30,9 @@ impl TimeSpec {
 
     // Construct a TimeSpec instance initialized with 0's
     pub fn empty() -> Self {
-        return TimeSpec{
+        return TimeSpec {
             tv_sec: 0,
             tv_nsec: 0,
-        }
+        };
     }
 }
-
-
-
-
-

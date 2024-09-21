@@ -1,5 +1,5 @@
 ////////////////////////////////////////////
-//! The purpose of this file is to provide 
+//! The purpose of this file is to provide
 //! basic timing functionality, such as sleeps
 //! getting the current time, etc.
 //!
@@ -9,12 +9,9 @@
 //!
 ////////////////////////////////////////////
 
-
 use crate::time::timestruct::TimeSpec;
 
 // TODO: make this return the current time
 pub fn now() -> TimeSpec {
     return TimeSpec::empty();
 }
-
-

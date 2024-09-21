@@ -54,8 +54,12 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     hlt_loop();
 }
 
+pub mod file;
+use crate::file::fs;
+
 fn main() {
     println!("hello world");
     println!(Red, "hello world");
     println!(Blue, "hello world");
+    
 }

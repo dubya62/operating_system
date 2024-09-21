@@ -70,4 +70,7 @@ fn main() {
 
     let err: Error = Error::new(10);
     err.perror();
+
+    let test_pipe: pipe::Pipe = pipe::Pipe::new(64);
+    
 }

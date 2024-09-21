@@ -35,7 +35,6 @@ Required functionality:
 */
 
 use ringbuffer::{AllocRingBuffer, RingBuffer};
-use crate::error::error::Error;
 
 // pipe struct definition
 pub struct Pipe {

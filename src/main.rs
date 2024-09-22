@@ -59,6 +59,7 @@ pub mod file;
 pub mod time;
 use crate::file::fs;
 use crate::file::pipe;
+use crate::file::bus;
 use error::Error;
 
 fn main() {
@@ -69,5 +70,9 @@ fn main() {
     fs::Stat::empty();
 
     let test_pipe: pipe::Pipe = pipe::Pipe::new(64);
+
+    //bus::enumerate_pci();
+
+    
     
 }

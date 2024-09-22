@@ -59,7 +59,7 @@ pub mod file;
 pub mod time;
 use crate::file::fs;
 use crate::file::pipe;
-use error::error::Error;
+use error::Error;
 
 fn main() {
     println!("hello world");
@@ -67,9 +67,6 @@ fn main() {
     println!(Blue, "hello world");
 
     fs::Stat::empty();
-
-    let err: Error = Error::new(10);
-    err.perror();
 
     let test_pipe: pipe::Pipe = pipe::Pipe::new(64);
     

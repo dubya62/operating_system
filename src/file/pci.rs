@@ -3,10 +3,6 @@
 //! to detect connected devices
 
 
-// FIXME: having problem where vendor data is always 0x1111
-// it is probably something to do with the offset
-// reference: https://forum.osdev.org/viewtopic.php?t=42725
-
 /*
 x86
 in eax, dx
@@ -15,16 +11,17 @@ out dx, eax
 
 use core::arch::asm;
 
+const PCI_ADDRESS_PORT: u16 = 0xCF8;
+const PCI_DATA_PORT: u16 = 0xCFC;
+
 /// perform low level port input (reading from port)
 pub fn inl(port: u16) -> u32 {
     let result: u32;
     unsafe {
         asm!(
-            "mov dx, {0:x}",
             "in eax, dx",
-            "mov {1:e}, eax",
-            in(reg) port,
-            out(reg) result,
+            in("dx") port,
+            out("eax") result,
         );
     }
     return result;
@@ -34,11 +31,9 @@ pub fn inl(port: u16) -> u32 {
 pub fn outl(value: u32, port: u16) {
     unsafe {
         asm!(
-            "mov eax, {0:e}",
-            "mov dx, {1:x}",
             "out dx, eax",
-            in(reg) value,
-            in(reg) port,
+            in("eax") value,
+            in("dx") port,
         );
     }
 }
@@ -64,13 +59,14 @@ impl PciAddress {
     }
 
     /// function to create a 32-bit pci address
-    pub fn create_address(&self) -> u32 {
+    pub fn create_address(&self, offset: u32) -> u32 {
         return 
             (1 << 31) |
             (self.bus_number << 16) |
             (self.device_number << 11) |
             (self.function_number << 8) |
-            (self.register_number << 2);
+            (self.register_number << 2) |
+            (offset & 0xFC);
     }
 
     // function to create an instance from an address
@@ -95,12 +91,12 @@ pub fn check_for_device(bus: u32, device: u32, function: u32) -> u32 {
             (device << 11) |
             (function << 8);
     // write to pci address port
-    outl(addr, 0xCF8);
+    outl(addr, PCI_ADDRESS_PORT);
     // read and return from data port
-    return inl(0xCFC);
+    return inl(PCI_DATA_PORT);
 }
 
-// FIXME: see note at top of file
+/// enumerate all possible pci devices and print their IDs
 pub fn enumerate_pci() {
     println!("Enumerating pci addresses...");
     let mut curr: u32;
@@ -108,8 +104,12 @@ pub fn enumerate_pci() {
         for device in 0..32 {
             for function in 0..8 {
                 curr = check_for_device(bus, device, function);
-                if curr != 0xFFFF {
+                if curr & 0xFFFF != 0xFFFF {
                     println!("Device found: {}", curr);
+                    let vendor_id = curr & 0xFFFF;
+                    let device_id = (curr & 0xFFFF0000) >> 16;
+                    println!("VendorID: {}", vendor_id);
+                    println!("DeviceID: {}", device_id);
                 }
             }
         }

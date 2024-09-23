@@ -1,6 +1,6 @@
 # This is the main CI workflow that runs the test suite on all pushes to main and all pull requests.
 # It runs the following jobs:
-# - required: runs the test suite on ubuntu with stable and beta rust toolchains
+# - required: runs the test suite on ubuntu
 # - coverage: runs the test suite and collects coverage information
 # See check.yml for information about how the concurrency cancellation and workflow triggering works
 permissions:
@@ -16,18 +16,15 @@ name: test
 jobs:
   required:
     runs-on: ubuntu-latest
-    name: ubuntu / ${{ matrix.toolchain }}
-    strategy:
-      matrix:
-        toolchain: [nightly]
+    name: ubuntu
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install ${{ matrix.toolchain }}
+      - name: Install nightly
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ matrix.toolchain }}
+          toolchain: nightly
       - name: cargo generate-lockfile
         # enable this ci template to run regardless of whether the lockfile is checked in or not
         if: hashFiles('Cargo.lock') == ''
@@ -61,15 +58,17 @@ jobs:
     #
     # for lots of more discussion
     runs-on: ubuntu-latest
-    name: ubuntu / stable / coverage
+    name: coverage
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install stable
+      - name: Install nightly
         uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools-preview
+          with:
+            toolchain: nightly
       - name: cargo install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: cargo generate-lockfile

@@ -23,12 +23,12 @@ name: check
 jobs:
   fmt:
     runs-on: ubuntu-latest
-    name: stable / fmt
+    name: fmt
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install stable
+      - name: Install nightly
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
@@ -36,23 +36,19 @@ jobs:
         run: cargo fmt --check
   clippy:
     runs-on: ubuntu-latest
-    name: ${{ matrix.toolchain }} / clippy
+    name: clippy
     permissions:
       contents: read
       checks: write
     strategy:
       fail-fast: false
-      matrix:
-        # Get early warning of new lints which are regularly introduced in beta channels.
-        toolchain: [stable, beta]
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install ${{ matrix.toolchain }}
+      - name: Install nightly
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ matrix.toolchain }}
           components: clippy
       - name: cargo clippy
         uses: giraffate/clippy-action@v1
@@ -66,9 +62,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install stable
+      - name: Install nightly
         uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: [nightly]
           components: rustfmt
       - name: cargo-semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2

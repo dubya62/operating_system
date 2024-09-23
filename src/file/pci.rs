@@ -10,9 +10,13 @@ out dx, eax
 */
 
 use core::arch::asm;
+use alloc::vec::Vec;
 
 const PCI_ADDRESS_PORT: u16 = 0xCF8;
 const PCI_DATA_PORT: u16 = 0xCFC;
+
+
+
 
 /// perform low level port input (reading from port)
 pub fn inl(port: u16) -> u32 {
@@ -81,42 +85,92 @@ impl PciAddress {
 
 }
 
-/// Check to see if a certain device is connected
-/// Return 0xFFFF if this device is not connected
-pub fn check_for_device(bus: u32, device: u32, function: u32) -> u32 {
-    // reimplemented here for speed (hopefully)
-    let addr: u32 = 
-            (1 << 31) |
-            (bus << 16) |
-            (device << 11) |
-            (function << 8);
+
+
+
+/// Dealing with class codes to dynamically load drivers
+pub fn debug_device(bus: u32, device: u32, function: u32) {
+    // create address struct
+    let test_addr: PciAddress = PciAddress::new(bus, device, function, 0);
+
+    let class_addr: u32 = test_addr.create_address(0x0B);
+    
     // write to pci address port
-    outl(addr, PCI_ADDRESS_PORT);
+    outl(class_addr, PCI_ADDRESS_PORT);
     // read and return from data port
-    return inl(PCI_DATA_PORT);
+    let result: u32 = inl(PCI_DATA_PORT);
+
+    let class_code = result >> 24;
+    let subclass_code = (result & 0x00FF0000) >> 16;
+    let programming_interface = (result & 0x0000FF00) >> 8;
+
+    println!("CC: {}    SCC: {}    PI: {}", class_code, subclass_code, programming_interface);
+
 }
 
-/// enumerate all possible pci devices and print their IDs
-pub fn enumerate_pci() {
-    println!("Enumerating pci addresses...");
-    let mut curr: u32;
-    for bus in 0..256 {
-        for device in 0..32 {
-            for function in 0..8 {
-                curr = check_for_device(bus, device, function);
-                if curr & 0xFFFF != 0xFFFF {
-                    println!("Device found: {}", curr);
+
+/// Main pci controller for the kernel
+/// handles enumeration and drivers for connected devices
+pub struct Pci {
+    addresses: Vec<u32>,
+}
+
+impl Pci {
+    /// constructor
+    pub fn new() -> Self {
+        return Pci {
+            addresses: Vec::new(),
+        };
+    }
+
+    /// Check to see if a certain device is connected
+    /// Return 0xFFFF if this device is not connected
+    pub fn check_for_device(addr: u32) -> u32 {
+        // write to pci address port
+        outl(addr, PCI_ADDRESS_PORT);
+        // read and return from data port
+        return inl(PCI_DATA_PORT);
+    }
+
+    /// enumerate all possible pci devices and print their IDs
+    pub fn enumerate_pci(&mut self) {
+        println!("Enumerating pci addresses...");
+        let mut curr: u32;
+        for bus in 0..256 {
+            for device in 0..32 {
+                for function in 0..8 {
+                    // calculate the address
+                    let addr: u32 = 
+                            (1 << 31) |
+                            (bus << 16) |
+                            (device << 11) |
+                            (function << 8);
+
+                    curr = Self::check_for_device(addr);
+
+                    // check if this is a valid device
                     let vendor_id = curr & 0xFFFF;
-                    let device_id = (curr & 0xFFFF0000) >> 16;
-                    println!("VendorID: {}", vendor_id);
-                    println!("DeviceID: {}", device_id);
+                    if vendor_id != 0xFFFF {
+                        // add its address to the list of devices
+                        self.addresses.push(addr);
+
+                        let device_id = (curr & 0xFFFF0000) >> 16;
+                        println!("VendorID: {}    DeviceId: {}", vendor_id, device_id);
+                    }
+
                 }
             }
         }
+        println!("Finished enumerating addresses!");
     }
-    println!("Finished enumerating addresses!");
-}
 
+    /// enumerate pci devices and add their configuration
+    pub fn init(&mut self) {
+        self.enumerate_pci();
+        
+    }
+
+}
 
 
 

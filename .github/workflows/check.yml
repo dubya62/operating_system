@@ -65,7 +65,7 @@ jobs:
       - name: Install nightly
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: [nightly]
+          toolchain: nightly
           components: rustfmt
       - name: cargo-semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2

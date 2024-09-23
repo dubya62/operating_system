@@ -25,6 +25,13 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
+      - name: Install components
+        run: |
+          rustup component add rust-src --toolchain nightly
+          rustup component add llvm-tools-preview --toolchain nightly
+          cargo install bootimage
+      - name: Install QEMU
+        run: apt-get install qemu-system
       - name: cargo generate-lockfile
         # enable this ci template to run regardless of whether the lockfile is checked in or not
         if: hashFiles('Cargo.lock') == ''

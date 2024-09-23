@@ -25,13 +25,14 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
-      - name: Install components
-        run: |
-          rustup component add rust-src --toolchain nightly
-          rustup component add llvm-tools-preview --toolchain nightly
-          cargo install bootimage
+          components: llvm-tools-preview,rust-src
+      - name: Install cargo bootimage
+        run: cargo install bootimage
       - name: Install QEMU
-        run: sudo apt-get install qemu-system
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: qemu-system
+          version: 1.0
       - name: cargo generate-lockfile
         # enable this ci template to run regardless of whether the lockfile is checked in or not
         if: hashFiles('Cargo.lock') == ''
@@ -73,8 +74,15 @@ jobs:
       - name: Install nightly
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: llvm-tools-preview
           toolchain: nightly
+          components: llvm-tools-preview,rust-src
+      - name: Install cargo bootimage
+        run: cargo install bootimage
+      - name: Install QEMU
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: qemu-system
+          version: 1.0
       - name: cargo install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: cargo generate-lockfile

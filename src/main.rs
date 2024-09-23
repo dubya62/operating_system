@@ -59,6 +59,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     hlt_loop();
 }
 
+use crate::file::fat32;
+
 fn main() {
     println!("hello world");
     println!(Red, "hello world");
@@ -68,5 +70,7 @@ fn main() {
 
     // let test_pipe: pipe::Pipe = pipe::Pipe::new(64);
 
-    file::pci::enumerate_pci();
+    //file::pci::enumerate_pci();
+
+    //fat32::test();
 }

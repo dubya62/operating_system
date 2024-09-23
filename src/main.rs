@@ -72,6 +72,6 @@ fn main() {
     let mut test_pipe: pipe::Pipe = pipe::Pipe::new(64);
 
     let mut test_pci: pci::Pci = pci::Pci::new();
-    test_pci.init();
+    test_pci.enumerate_pci();
     
 }

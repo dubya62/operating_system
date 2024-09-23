@@ -23,14 +23,14 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 }
 
 pub trait TestFn {
-    fn run(&self) -> ();
+    fn run(&self);
 }
 
 impl<F> TestFn for F
 where
-    F: Fn() -> (),
+    F: Fn(),
 {
-    fn run(&self) -> () {
+    fn run(&self) {
         serial_print!("test {} ...", core::any::type_name::<F>());
         self();
         serial_println!("ok");

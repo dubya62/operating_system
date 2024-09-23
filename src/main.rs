@@ -8,17 +8,20 @@
 #![test_runner(crate::test::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+use alloc::string::String;
 use bootloader::{entry_point, BootInfo};
 
 extern crate alloc;
 
 #[macro_use]
 pub mod vga;
+pub mod crypt;
+pub mod error;
+pub mod file;
 pub mod gdt;
 pub mod interrupts;
 pub mod memory;
-pub mod crypt;
-
+pub mod time;
 
 #[cfg(test)]
 pub mod test;
@@ -56,25 +59,14 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     hlt_loop();
 }
 
-pub mod error;
-pub mod file;
-pub mod time;
-use crate::file::fs;
-use crate::file::pipe;
-use crate::file::pci;
-use error::Error;
-
 fn main() {
     println!("hello world");
     println!(Red, "hello world");
     println!(Blue, "hello world");
 
-    fs::Stat::empty();
+    // fs::Stat::default();
 
-    let mut test_pipe: pipe::Pipe = pipe::Pipe::new(64);
+    // let test_pipe: pipe::Pipe = pipe::Pipe::new(64);
 
-    // pci::enumerate_pci();
-
-    
-    
+    file::pci::enumerate_pci();
 }

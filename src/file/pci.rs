@@ -2,11 +2,10 @@
 //! Specifically, this file deals with PCI bus enumeration
 //! to detect connected devices
 
-
 /*
 x86
 in eax, dx
-out dx, eax 
+out dx, eax
 */
 
 use core::arch::asm;
@@ -24,7 +23,7 @@ pub fn inl(port: u16) -> u32 {
             out("eax") result,
         );
     }
-    return result;
+    result
 }
 
 /// perform low level port output (writing to port)
@@ -40,33 +39,23 @@ pub fn outl(value: u32, port: u16) {
 
 /// A pci address as a structure
 /// Allows easier access to each element of the address
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct PciAddress {
-    bus_number: u32,
-    device_number: u32,
-    function_number: u32,
-    register_number: u32,
+    pub bus_number: u32,
+    pub device_number: u32,
+    pub function_number: u32,
+    pub register_number: u32,
 }
 
 impl PciAddress {
-    /// consturctor
-    pub fn new(bus_number: u32, device_number: u32, function_number: u32, register_number: u32) -> Self {
-        return PciAddress {
-            bus_number: bus_number,
-            device_number: device_number,
-            function_number: function_number,
-            register_number: register_number,
-        };
-    }
-
     /// function to create a 32-bit pci address
     pub fn create_address(&self, offset: u32) -> u32 {
-        return 
-            (1 << 31) |
-            (self.bus_number << 16) |
-            (self.device_number << 11) |
-            (self.function_number << 8) |
-            (self.register_number << 2) |
-            (offset & 0xFC);
+        (1 << 31)
+            | (self.bus_number << 16)
+            | (self.device_number << 11)
+            | (self.function_number << 8)
+            | (self.register_number << 2)
+            | (offset & 0xFC)
     }
 
     // function to create an instance from an address
@@ -78,25 +67,21 @@ impl PciAddress {
 
     }
     */
-
 }
 
 /// Check to see if a certain device is connected
 /// Return 0xFFFF if this device is not connected
 pub fn check_for_device(bus: u32, device: u32, function: u32) -> u32 {
     // reimplemented here for speed (hopefully)
-    let addr: u32 = 
-            (1 << 31) |
-            (bus << 16) |
-            (device << 11) |
-            (function << 8);
+    let addr = (1 << 31) | (bus << 16) | (device << 11) | (function << 8);
     // write to pci address port
     outl(addr, PCI_ADDRESS_PORT);
     // read and return from data port
-    return inl(PCI_DATA_PORT);
+    inl(PCI_DATA_PORT)
 }
 
 /// enumerate all possible pci devices and print their IDs
+// TODO: Make this return an iterator so we can use this in code
 pub fn enumerate_pci() {
     println!("Enumerating pci addresses...");
     let mut curr: u32;
@@ -116,10 +101,3 @@ pub fn enumerate_pci() {
     }
     println!("Finished enumerating addresses!");
 }
-
-
-
-
-
-
-

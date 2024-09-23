@@ -32,7 +32,7 @@ lazy_static! {
         }
 
         idt[InterruptIndex::Timer as u8]
-            .set_handler_fn(interrupts::timer_interrupt_handler);
+            .set_handler_fn(interrupt::timer_interrupt_handler);
         idt[InterruptIndex::Keyboard as u8]
             .set_handler_fn(keyboard::keyboard_interrupt_handler);
 
@@ -54,7 +54,7 @@ fn eoi(interrupt: InterruptIndex) {
     }
 }
 
-mod interrupts {
+mod interrupt {
     use x86_64::structures::idt::InterruptStackFrame;
 
     use super::{eoi, InterruptIndex};

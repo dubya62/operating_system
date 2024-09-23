@@ -143,7 +143,7 @@ fn key_expansion(round_key: &mut [u8], key: &[u8]) {
         let j = i << 2;
         let l = (i - NK) << 2;
 
-        round_key[j + 0] = round_key[l + 0] ^ tempa[0];
+        round_key[j] = round_key[l] ^ tempa[0];
         round_key[j + 1] = round_key[l + 1] ^ tempa[1];
         round_key[j + 2] = round_key[l + 2] ^ tempa[2];
         round_key[j + 3] = round_key[l + 3] ^ tempa[3];
@@ -155,10 +155,10 @@ fn key_expansion(round_key: &mut [u8], key: &[u8]) {
 fn add_round_key(round: usize, state: &mut StateT, round_key: &[u8]) {
     let round_offset = (round * NB) << 2;
 
-    for i in 0..4 {
+    for (i, row) in state.iter_mut().enumerate() {
         let temp = i * NB + round_offset;
         for j in 0..4 {
-            state[i][j] ^= round_key[temp + j];
+            row[j] ^= round_key[temp + j];
         }
     }
 }
@@ -207,24 +207,24 @@ fn xtime(x: u8) -> u8 {
 
 fn mix_columns(state: &mut StateT) {
     macro_rules! do_op {
-        ($n: literal, $i: expr, $tmp: expr) => {
-            let tm = state[$i][$n] ^ state[$i][$n + 1];
+        ($n: literal, $row: expr, $tmp: expr) => {
+            let tm = $row[$n] ^ $row[$n + 1];
             let tm = xtime(tm);
-            state[$i][$n] ^= tm ^ $tmp;
+            $row[$n] ^= tm ^ $tmp;
         };
     }
 
-    for i in 0..4 {
-        let t = state[i][0];
-        let tmp = state[i][0] ^ state[i][1] ^ state[i][2] ^ state[i][3];
+    for row in state.iter_mut() {
+        let t = row[0];
+        let tmp = row[0] ^ row[1] ^ row[2] ^ row[3];
 
-        do_op!(0, i, tmp);
-        do_op!(1, i, tmp);
-        do_op!(2, i, tmp);
+        do_op!(0, row, tmp);
+        do_op!(1, row, tmp);
+        do_op!(2, row, tmp);
 
-        let tm = state[i][3] ^ t;
+        let tm = row[3] ^ t;
         let tm = xtime(tm);
-        state[i][3] ^= tm ^ tmp;
+        row[3] ^= tm ^ tmp;
     }
 }
 
@@ -244,12 +244,12 @@ fn multiply(x: u8, y: u8) -> u8 {
 /// The method used to multiply may be difficult to understand for the inexperienced. Please use
 /// the references to gain more information.
 fn inv_mix_columns(state: &mut StateT) {
-    for i in 0..4 {
-        let [a, b, c, d] = state[i];
+    for row in state.iter_mut() {
+        let [a, b, c, d] = *row;
 
         let mut nums = [0x0e, 0x0b, 0x0d, 0x09];
 
-        for j in state[i].iter_mut() {
+        for j in row.iter_mut() {
             *j = multiply(a, nums[0])
                 ^ multiply(b, nums[1])
                 ^ multiply(c, nums[2])
@@ -318,7 +318,8 @@ fn cipher(state: &mut StateT, round_key: &[u8]) {
     add_round_key(NR, state, round_key);
 }
 
-fn inv_cipher(state: &mut StateT, round_key: &[u8]) {
+// TODO: This may not need to be pub.  If not, then function should be removed.
+pub fn inv_cipher(state: &mut StateT, round_key: &[u8]) {
     // Add the First round key to the state before starting the rounds.
     add_round_key(NR, state, round_key);
 
@@ -349,7 +350,7 @@ fn xor_with_iv(buf: &mut [u8], iv: &[u8; AES_BLOCKLEN]) {
 fn buffer_to_statet(buf: &[u8], i: usize) -> StateT {
     // i is the offset (just used i to make the code shorter)
     [
-        [buf[i + 0], buf[i + 1], buf[i + 2], buf[i + 3]],
+        [buf[i], buf[i + 1], buf[i + 2], buf[i + 3]],
         [buf[i + 4], buf[i + 5], buf[i + 6], buf[i + 7]],
         [buf[i + 8], buf[i + 9], buf[i + 10], buf[i + 11]],
         [buf[i + 12], buf[i + 13], buf[i + 14], buf[i + 15]],
@@ -357,6 +358,7 @@ fn buffer_to_statet(buf: &[u8], i: usize) -> StateT {
 }
 
 // Aes context structure
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct AesCtx {
     round_key: [u8; AES_KEYEXPSIZE],
     iv: [u8; AES_BLOCKLEN],

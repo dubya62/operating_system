@@ -13,7 +13,7 @@ pub mod allocator;
 /// ## SAFETY
 ///
 /// - The complete physical memory must be mapped to virtual memory at the passed
-/// `physical_memory_offset`.
+///   `physical_memory_offset`.
 /// - This function must be only called once to avoid aliasing `&mut` references.
 pub fn init(boot_info: &'static BootInfo) {
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);

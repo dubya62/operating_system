@@ -31,3 +31,6 @@ ringbuffer = "0.15.0"
 
 [dev-dependencies]
 uart_16550 = "0.3.1"
+
+[lints.clippy]
+redundant_type_annotations = "warn"

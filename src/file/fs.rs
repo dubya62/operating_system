@@ -56,6 +56,7 @@ struct stat{
 use crate::time::timestruct;
 
 // file information structure
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct Stat {
     pub st_dev: i32,
     pub st_ino: i32,
@@ -71,58 +72,4 @@ pub struct Stat {
     pub st_atim: timestruct::TimeSpec,
     pub st_mtim: timestruct::TimeSpec,
     pub st_ctim: timestruct::TimeSpec,
-}
-
-impl Stat {
-    pub fn new(
-        st_dev: i32,
-        st_ino: i32,
-        st_mode: i32,
-        st_nlink: i32,
-        st_uid: i32,
-        st_gid: i32,
-        st_rdev: i32,
-        st_size: i32,
-        st_blksize: i32,
-        st_blocks: i32,
-        st_atim: timestruct::TimeSpec,
-        st_mtim: timestruct::TimeSpec,
-        st_ctim: timestruct::TimeSpec,
-    ) -> Self {
-        return Stat {
-            st_dev: st_dev,
-            st_ino: st_ino,
-            st_mode: st_mode,
-            st_nlink: st_nlink,
-            st_uid: st_uid,
-            st_gid: st_gid,
-            st_rdev: st_rdev,
-            st_size: st_size,
-            st_blksize: st_blksize,
-            st_blocks: st_blocks,
-
-            st_atim: st_atim,
-            st_mtim: st_mtim,
-            st_ctim: st_ctim,
-        };
-    }
-
-    pub fn empty() -> Self {
-        return Stat {
-            st_dev: 0,
-            st_ino: 0,
-            st_mode: 0,
-            st_nlink: 0,
-            st_uid: 0,
-            st_gid: 0,
-            st_rdev: 0,
-            st_size: 0,
-            st_blksize: 0,
-            st_blocks: 0,
-
-            st_atim: timestruct::TimeSpec::empty(),
-            st_mtim: timestruct::TimeSpec::empty(),
-            st_ctim: timestruct::TimeSpec::empty(),
-        };
-    }
 }

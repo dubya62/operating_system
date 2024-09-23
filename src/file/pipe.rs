@@ -36,35 +36,33 @@ Required functionality:
 
 use ringbuffer::{AllocRingBuffer, RingBuffer};
 
-// TODO: rather than halting, wait until other end of the pipe performs operation
 use crate::hlt_loop;
 
-// pipe struct definition
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Pipe {
     w_lock: bool,                // whether or not writing process is suspended
     r_lock: bool,                // whether or not reading process is suspended
-    nonblocking: i32,            // whether or not the pipe is nonblocking
+    _nonblocking: i32,           // whether or not the pipe is nonblocking
     buffer: AllocRingBuffer<u8>, // buffer to contain the data
 }
 
 impl Pipe {
-    /// constructor
+    /// Construct a new pipe, size > 0
     pub fn new(size: usize) -> Self {
-        // make sure the capacity is not 0 (or else it will panic)
-        if size == 0 {
-            panic!("Pipe with capacity of 0 is not allowed!");
-        }
+        // make sure the capacity is not 0
+        assert_ne!(size, 0, "Pipe with capacity of 0 is not allowed!");
+
         // return an instance of a Pipe with an allocated buffer
-        return Pipe {
+        Pipe {
             w_lock: false,
             r_lock: false,
-            nonblocking: 0, // TODO: implement nonblocking pipes
+            _nonblocking: 0, // TODO: implement nonblocking pipes
             buffer: AllocRingBuffer::new(size),
-        };
+        }
     }
 
-    /// attempt to write from a buffer to the pipe
-    /// return the number of bytes written or -1 on error
+    /// Attempt to write from a buffer to the pipe return the number of bytes written or -1 on
+    /// error
     pub fn write(&mut self, buffer: &[u8]) -> usize {
         let mut written: usize = 0;
         // while there are still bytes to write
@@ -74,6 +72,7 @@ impl Pipe {
                 println!("Write into full pipe blocked.");
                 // TODO: suspend the process until a read unsuspends it
                 self.w_lock = true;
+                // TODO: rather than halting, wait until other end of the pipe performs operation
                 hlt_loop();
             }
 
@@ -104,7 +103,7 @@ impl Pipe {
         }
 
         // return how many bytes were written
-        return written;
+        written
     }
 
     /// attempt to read from the pipe into a buffer
@@ -119,6 +118,7 @@ impl Pipe {
             println!("Read from empty pipe blocked.");
             self.r_lock = true;
             // TODO: suspend the process instead of forever looping
+            // TODO: rather than halting, wait until other end of the pipe performs operation
             hlt_loop();
         }
 
@@ -131,6 +131,8 @@ impl Pipe {
         }
 
         // read all available bytes
+        // TODO: This is probably not the right solution, I just don't like what clippy recommends
+        #[allow(clippy::needless_range_loop)]
         for i in 0..reading {
             // FIXME: handle EOF by closing the pipe
             buffer[i] = self
@@ -145,6 +147,6 @@ impl Pipe {
         self.w_lock = false;
 
         // return the number of bytes read
-        return bytes_read;
+        bytes_read
     }
 }

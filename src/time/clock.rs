@@ -13,5 +13,5 @@ use crate::time::timestruct::TimeSpec;
 
 // TODO: make this return the current time
 pub fn now() -> TimeSpec {
-    return TimeSpec::empty();
+    TimeSpec::empty()
 }

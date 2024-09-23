@@ -56,8 +56,25 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     hlt_loop();
 }
 
+pub mod error;
+pub mod file;
+pub mod time;
+use crate::file::fs;
+use crate::file::pipe;
+use crate::file::pci;
+use error::Error;
+
 fn main() {
     println!("hello world");
     println!(Red, "hello world");
     println!(Blue, "hello world");
+
+    fs::Stat::empty();
+
+    let mut test_pipe: pipe::Pipe = pipe::Pipe::new(64);
+
+    // pci::enumerate_pci();
+
+    
+    
 }

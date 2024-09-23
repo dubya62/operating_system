@@ -7,6 +7,7 @@
 use core::arch::asm;
 use alloc::vec::Vec;
 
+use crate::file::disk;
 
 const PCI_ADDRESS_PORT: u16 = 0xCF8;
 const PCI_DATA_PORT: u16 = 0xCFC;
@@ -60,7 +61,6 @@ impl PciAddress {
 pub struct Pci {
     // Vector containing all active pci addresses
     addresses: Vec<PciAddress>,
-
 }
 
 impl Pci {
@@ -70,6 +70,7 @@ impl Pci {
             addresses: Vec::new(),
         }
     }
+
 
     /// function to check a single device address
     fn check_device(&self, bus: u32, device: u32, function: u32, offset: u32) -> u32 {
@@ -83,6 +84,7 @@ impl Pci {
         // return data from data port
         return inl(PCI_DATA_PORT);
     }
+
 
     /// function to enumerate a single bus
     fn enumerate_bus(&mut self, bus: u32) {
@@ -119,6 +121,7 @@ impl Pci {
 
     }
 
+
     /// Function to enumerate the PCI space
     pub fn enumerate_pci(&mut self) {
         // empty the vector of addresses
@@ -126,10 +129,33 @@ impl Pci {
             
         // iterate through the first bus
         self.enumerate_bus(0);
-
+        
     }
 
-    
+    // FIXME: Implement this in a way better way 
+    // (right now just need to be able to read/write to disk)
+    /// Function to try to load ATA driver
+    pub fn load_disk_driver(&self) -> disk::DiskDriver {
+        // iterate through the addresses
+        for i in 0..self.addresses.len() {
+            // check each address to see if it needs a DiskDriver
+            let class_codes: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0);
+
+            let class_code: u32 = class_codes >> 24;
+            let subclass_code: u32 = (class_codes >> 16) & 0xFF;
+            let programming_interface: u32 = (class_codes >> 8) & 0xFF;
+            
+            if class_code == 0x1 {
+                if subclass_code == 0x1 {
+                    return disk::DiskDriver::new(class_code, subclass_code, programming_interface);
+                }
+            }
+
+        }
+
+        return disk::DiskDriver::new(0, 0, 0);
+
+    }
 
 }
 

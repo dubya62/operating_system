@@ -60,6 +60,7 @@ pub mod time;
 use crate::file::fs;
 use crate::file::pipe;
 use crate::file::pci;
+use crate::file::disk;
 use error::Error;
 
 fn main() {
@@ -73,5 +74,7 @@ fn main() {
 
     let mut test_pci: pci::Pci = pci::Pci::new();
     test_pci.enumerate_pci();
+    let test_driver: disk::DiskDriver = test_pci.load_disk_driver();
+    
     
 }

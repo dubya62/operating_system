@@ -69,9 +69,9 @@ fn main() {
 
     fs::Stat::empty();
 
-    let test_pipe: pipe::Pipe = pipe::Pipe::new(64);
+    let mut test_pipe: pipe::Pipe = pipe::Pipe::new(64);
 
-    pci::enumerate_pci();
+    // pci::enumerate_pci();
 
     
     

@@ -2,6 +2,7 @@
 name = "operating_system"
 version = "0.1.0"
 edition = "2018"
+default-run = "operating_system"
 
 [package.metadata.bootimage]
 test-args = [
@@ -21,12 +22,13 @@ panic = "abort"
 
 [dependencies]
 bootloader = { version = "0.9", features = ["map_physical_memory"] } # TODO: Update this dependency
+lazy_static = { version = "1.5", features = ["spin_no_std"] }
+linked_list_allocator = "0.10.5"
+object = { version = "0.36.4", default-features = false, features = ["read"] }
+pc-keyboard = "0.8.0"
+pic8259 = "0.11.0"
 spin = "0.9.8"
 x86_64 = "0.15.1"
-lazy_static = { version = "1.5", features = ["spin_no_std"] }
-pic8259 = "0.11.0"
-pc-keyboard = "0.8.0"
-linked_list_allocator = "0.10.5"
 
 [dev-dependencies]
 uart_16550 = "0.3.1"

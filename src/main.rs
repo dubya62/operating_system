@@ -14,11 +14,10 @@ extern crate alloc;
 
 #[macro_use]
 pub mod vga;
+pub mod crypt;
 pub mod gdt;
 pub mod interrupts;
 pub mod memory;
-pub mod crypt;
-
 
 #[cfg(test)]
 pub mod test;
@@ -60,8 +59,8 @@ pub mod error;
 pub mod file;
 pub mod time;
 use crate::file::fs;
-use crate::file::pipe;
 use crate::file::pci;
+use crate::file::pipe;
 use error::Error;
 
 fn main() {
@@ -74,7 +73,4 @@ fn main() {
     let mut test_pipe: pipe::Pipe = pipe::Pipe::new(64);
 
     // pci::enumerate_pci();
-
-    
-    
 }

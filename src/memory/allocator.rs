@@ -65,7 +65,6 @@ struct ListNode {
     next: Option<&'static mut ListNode>,
 }
 
-///
 struct FixedSizeBlockAllocator {
     heads: [Option<&'static mut ListNode>; Self::BLOCK_SIZES.len()],
     fallback_alloc: linked_list_allocator::Heap,

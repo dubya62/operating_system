@@ -41,9 +41,9 @@ use crate::hlt_loop;
 
 // pipe struct definition
 pub struct Pipe {
-    w_lock: bool, // whether or not writing process is suspended
-    r_lock: bool, // whether or not reading process is suspended
-    nonblocking: i32, // whether or not the pipe is nonblocking
+    w_lock: bool,                // whether or not writing process is suspended
+    r_lock: bool,                // whether or not reading process is suspended
+    nonblocking: i32,            // whether or not the pipe is nonblocking
     buffer: AllocRingBuffer<u8>, // buffer to contain the data
 }
 
@@ -67,7 +67,7 @@ impl Pipe {
     /// return the number of bytes written or -1 on error
     pub fn write(&mut self, buffer: &[u8]) -> usize {
         let mut written: usize = 0;
-        // while there are still bytes to write 
+        // while there are still bytes to write
         while written < buffer.len() {
             // if there is no space left in the buffer, wait until there is space
             if self.buffer.is_full() {
@@ -92,21 +92,21 @@ impl Pipe {
             }
 
             // write the max number of writable bytes
-            self.buffer.extend(buffer[written..written + writable].iter().copied());
+            self.buffer
+                .extend(buffer[written..written + writable].iter().copied());
             written += writable;
         }
 
-        // if at least 1 byte was written, 
+        // if at least 1 byte was written,
         // the pipe is now allowed to be readable
         if written > 0 {
             self.r_lock = false;
         }
-            
+
         // return how many bytes were written
         return written;
     }
 
-    
     /// attempt to read from the pipe into a buffer
     /// return the number of bytes read or -1 on error
     pub fn read(&mut self, buffer: &mut [u8]) -> usize {
@@ -122,7 +122,7 @@ impl Pipe {
             hlt_loop();
         }
 
-        // if we are reading fewer bytes than are in the buffer, 
+        // if we are reading fewer bytes than are in the buffer,
         // just read everything available in the buffer
         let available: usize = self.buffer.len(); // try to avoid non-atomic problem
         let mut reading: usize = available;
@@ -133,7 +133,8 @@ impl Pipe {
         // read all available bytes
         for i in 0..reading {
             // FIXME: handle EOF by closing the pipe
-            buffer[i] = self.buffer
+            buffer[i] = self
+                .buffer
                 .dequeue()
                 .expect("Somehow the pipe's buffer was empty even though it's not?");
         }
@@ -146,8 +147,4 @@ impl Pipe {
         // return the number of bytes read
         return bytes_read;
     }
-
 }
-
-
-

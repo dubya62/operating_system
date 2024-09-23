@@ -64,10 +64,6 @@ fn main() {
     println!(Red, "hello world");
     println!(Blue, "hello world");
 
-    let mut x: String = String::new();
-    x.push_str("hello");
-    println!("{}", x);
-
     // fs::Stat::default();
 
     // let test_pipe: pipe::Pipe = pipe::Pipe::new(64);

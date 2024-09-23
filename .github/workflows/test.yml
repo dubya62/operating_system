@@ -31,7 +31,7 @@ jobs:
           rustup component add llvm-tools-preview --toolchain nightly
           cargo install bootimage
       - name: Install QEMU
-        run: apt-get install qemu-system
+        run: sudo apt-get install qemu-system
       - name: cargo generate-lockfile
         # enable this ci template to run regardless of whether the lockfile is checked in or not
         if: hashFiles('Cargo.lock') == ''

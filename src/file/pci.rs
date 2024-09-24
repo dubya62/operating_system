@@ -152,6 +152,7 @@ impl Pci {
                     let class_code: u32 = class_codes >> 24;
                     let subclass_code: u32 = (class_codes >> 16) & 0xFF;
                     let programming_interface: u32 = (class_codes >> 8) & 0xFF;
+                    println!("DEV: {:#x}    VEN: {:#x}", (curr & 0xFFFF0000) >> 16, curr & 0xFFFF);
                     println!("CC: {}    SCC: {}    PI: {}", class_code, subclass_code, programming_interface);
 
                     let class_codes: u32 = self.check_device(bus, device, function, 0xC);
@@ -220,12 +221,14 @@ impl Pci {
                         bar5 = 0x0;
 
                     }
+                    /*
                     println!("bar0: {}", bar0);
                     println!("bar1: {}", bar1);
                     println!("bar2: {}", bar2);
                     println!("bar3: {}", bar3);
                     println!("bar4: {}", bar4);
                     println!("bar5: {}", bar5);
+                    */
 
                     return disk::DiskDriver::new(class_code, subclass_code, programming_interface, bar0, bar1, bar2, bar3, bar4, bar5);
                 }

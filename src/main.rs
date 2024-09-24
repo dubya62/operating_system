@@ -75,6 +75,11 @@ fn main() {
     let mut test_pci: pci::Pci = pci::Pci::new();
     test_pci.enumerate_pci();
     let test_driver: disk::DiskDriver = test_pci.load_disk_driver();
+
+    let mut test_buffer: [u8; 512] = [0; 512];
     
+    test_driver.read_sector(0, &mut test_buffer);
+
+    println!("first sector: {:?}", test_buffer);
     
 }

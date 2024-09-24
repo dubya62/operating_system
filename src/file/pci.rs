@@ -13,7 +13,32 @@ const PCI_ADDRESS_PORT: u16 = 0xCF8;
 const PCI_DATA_PORT: u16 = 0xCFC;
 
 
+
 /// perform low level port input (reading from port)
+pub fn inb(port: u16) -> u8 {
+    let result: u8;
+    unsafe {
+        asm!(
+            "in al, dx",
+            in("dx") port,
+            out("al") result,
+        );
+    }
+    return result;
+}
+
+pub fn inw(port: u16) -> u16 {
+    let result: u16;
+    unsafe {
+        asm!(
+            "in ax, dx",
+            in("dx") port,
+            out("ax") result,
+        );
+    }
+    return result;
+}
+
 pub fn inl(port: u16) -> u32 {
     let result: u32;
     unsafe {
@@ -27,6 +52,26 @@ pub fn inl(port: u16) -> u32 {
 }
 
 /// perform low level port output (writing to port)
+pub fn outb(value: u8, port: u16) {
+    unsafe {
+        asm!(
+            "out dx, al",
+            in("al") value,
+            in("dx") port,
+        );
+    }
+}
+
+pub fn outw(value: u16, port: u16) {
+    unsafe {
+        asm!(
+            "out dx, ax",
+            in("ax") value,
+            in("dx") port,
+        );
+    }
+}
+
 pub fn outl(value: u32, port: u16) {
     unsafe {
         asm!(
@@ -147,13 +192,20 @@ impl Pci {
             
             if class_code == 0x1 {
                 if subclass_code == 0x1 {
-                    return disk::DiskDriver::new(class_code, subclass_code, programming_interface);
+                    let bar0: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x10);
+                    let bar1: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x14);
+                    let bar2: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x18);
+                    let bar3: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x1C);
+                    let bar4: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x20);
+                    let bar5: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x24);
+
+                    return disk::DiskDriver::new(class_code, subclass_code, programming_interface, bar0, bar1, bar2, bar3, bar4, bar5);
                 }
             }
 
         }
 
-        return disk::DiskDriver::new(0, 0, 0);
+        return disk::DiskDriver::new(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     }
 

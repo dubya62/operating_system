@@ -150,10 +150,35 @@ impl DiskDriver {
             let curr: u16 = inw(self.regs.data);
             buffer[i] = ((curr & 0xFF00) >> 8) as u8;
             buffer[i+1] = (curr & 0xFF) as u8;
-            println!("curr = {}", curr);
+            //println!("curr = {}", curr);
         }
         println!("Finished Reading sector!");
 
+        /*
+        println!("{}", self.bar0);
+        println!("{}", self.bar1);
+        println!("{}", self.bar2);
+        println!("{}", self.bar3);
+        println!("{}", self.bar4);
+        println!("{}", self.bar5);
+        */
+
+    }
+
+
+    /// write using master bus
+    pub fn master_write_sector(&self) {
+        // get base address of master ports
+        let addr: u32 = self.bar4 & 0xFFFFFF00;
+    }
+
+    /// read using master bus
+    pub fn master_read_sector(&self) {
+        // get base address of master ports
+        let addr: u32 = self.bar4 & 0xFFFFFF00;
+        
+
+        
     }
 
 }

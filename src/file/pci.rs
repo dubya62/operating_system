@@ -151,7 +151,8 @@ impl Pci {
                      
                     let class_code: u32 = class_codes >> 24;
                     let subclass_code: u32 = (class_codes >> 16) & 0xFF;
-                    println!("CC: {}    SCC: {}", class_code, subclass_code);
+                    let programming_interface: u32 = (class_codes >> 8) & 0xFF;
+                    println!("CC: {}    SCC: {}    PI: {}", class_code, subclass_code, programming_interface);
 
                     let class_codes: u32 = self.check_device(bus, device, function, 0xC);
 
@@ -184,7 +185,7 @@ impl Pci {
         // iterate through the addresses
         for i in 0..self.addresses.len() {
             // check each address to see if it needs a DiskDriver
-            let class_codes: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0);
+            let class_codes: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x8);
 
             let class_code: u32 = class_codes >> 24;
             let subclass_code: u32 = (class_codes >> 16) & 0xFF;
@@ -192,12 +193,39 @@ impl Pci {
             
             if class_code == 0x1 {
                 if subclass_code == 0x1 {
-                    let bar0: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x10);
-                    let bar1: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x14);
-                    let bar2: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x18);
-                    let bar3: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x1C);
-                    let bar4: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x20);
-                    let bar5: u32 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x24);
+                    // determine if device is in PCI native mode or not
+                    let mut bar0: u32;
+                    let mut bar1: u32;
+                    let mut bar2: u32;
+                    let mut bar3: u32;
+                    let mut bar4: u32;
+                    let mut bar5: u32;
+
+                    if programming_interface & 0x1 == 0 {
+
+                        println!("Here");
+                        bar0 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x10) & !(0xF);
+                        bar1 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x14) & !(0xF);
+                        bar2 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x18) & !(0xF);
+                        bar3 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x1C) & !(0xF);
+                        bar4 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x20) & !(0xF);
+                        bar5 = self.check_device(self.addresses[i].bus, self.addresses[i].device, self.addresses[i].function, 0x24) & !(0xF);
+                    } else {
+                        println!("Device is in compatibility mode!");
+                        bar0 = 0x1F0;
+                        bar1 = 0x3f6;
+                        bar2 = 0x170;
+                        bar3 = 0x376;
+                        bar4 = 0x0;
+                        bar5 = 0x0;
+
+                    }
+                    println!("bar0: {}", bar0);
+                    println!("bar1: {}", bar1);
+                    println!("bar2: {}", bar2);
+                    println!("bar3: {}", bar3);
+                    println!("bar4: {}", bar4);
+                    println!("bar5: {}", bar5);
 
                     return disk::DiskDriver::new(class_code, subclass_code, programming_interface, bar0, bar1, bar2, bar3, bar4, bar5);
                 }

@@ -80,6 +80,6 @@ fn main() {
     
     test_driver.read_sector(0, &mut test_buffer);
 
-    println!("first sector: {:?}", test_buffer);
+    //println!("first sector: {:?}", test_buffer);
     
 }

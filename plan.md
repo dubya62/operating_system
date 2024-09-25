@@ -16,7 +16,7 @@ User key:
 ```
 Primary drive:
 
-[user key decrypter (UKD) (unencrypted)]
+[user key decrypter (UKD) (encrypted with unique key from each usb)]
 [Kernel Decryption Key (KDK) (multiple copies, each encrypted with a user's private key)]
 [Kernel (encrypted with KDK's private key)]
 [Group Keys (each group key encrypted with each member's public key)]
@@ -90,7 +90,7 @@ Primary drive:
 <BR><BR><BR>
 
 ## Attack Mitigations
--   Use rolling keys (mitigates attacker get another user's key)
+-   Use rolling keys (mitigates attacker getting another user's key)
     - every time a user loads the kernel, change their key
         - even if an attacker gets a copy of their key, the next login will change it
     - roll the kernel key every now and then
@@ -99,9 +99,39 @@ Primary drive:
 -   Allow admins to require strong enough passwords so that writing over the main disk does not work
     - an attacker could write over the main disk and trick the user into booting on it
     - the user would need to know to not put their password in
+-   Encrypt the UKD with a key on each user usb
+    - an attacker would need to either copy or modify a user key before an evil twin attack works
 
 
 ## REMAINING PROBLEMS:
--   Prevent a user from being socially engineered when their usb is replaced with an evil twin
+-   Prevent a user from being socially engineered when their usb is replaced/modified with an evil twin
 -   Give the kernel some way to start up processes (services) as other users without the user getting the root key
+
+
+## Solving the problem of securely starting up services
+-   Kernel can simply perform priviledged actions, but cannot access user files securely
+-   As long as a root user is logged in, they can give the kernel root access
+-   Possible solution:
+    - make users members of groups that servers are in
+    - making a user a member of that group gives them permission to startup the server on boot
+```
+Suppose we have users (and their groups):
+    Bob - (Bob, sudo, other)
+    Alice - (Alice, httpd, other)
+    Eve - (Eve, other)
+
+Group Keys area:
+[root, Bob, Alice, Eve, httpd, other] - Encrypted with sudo key
+[Bob, sudo] - Encrypted with Bob key
+[Alice, httpd] - Encrypted with Alice key
+[Eve] - Encrypted with Eve key
+[httpd] - Encrypted with httpd key
+
+Can start httpd:
+-   Root, Bob, Alice
+
+```
+
+
+
 

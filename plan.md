@@ -96,10 +96,12 @@ Primary drive:
     - roll the kernel key every now and then
     - roll user keys every now and then
     - roll keys when user has group priviledges added/revoked
+-   Allow admins to require strong enough passwords so that writing over the main disk does not work
+    - an attacker could write over the main disk and trick the user into booting on it
+    - the user would need to know to not put their password in
 
 
 ## REMAINING PROBLEMS:
 -   Prevent a user from being socially engineered when their usb is replaced with an evil twin
 -   Give the kernel some way to start up processes (services) as other users without the user getting the root key
-
 
